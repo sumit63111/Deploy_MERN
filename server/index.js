@@ -8,7 +8,7 @@ const app = express();
 // CORS Configuration
 app.use(
   cors({
-    origin: "https://deploy-mern-frontend-eight.vercel.app", // Frontend origin
+    origin: ["https://deploy-mern-frontend-eight.vercel.app"], // Frontend origin
     methods: ["POST", "GET"], // Allowed methods
     credentials: true, // Allow credentials like cookies or HTTP auth
   })
@@ -18,7 +18,7 @@ app.use(express.json()); // Parse incoming JSON payloads
 
 // MongoDB URI directly included
 // const mongodbURI = 'mongodb+srv://yousaf:test123@cluster0.g4i5dey.mongodb.net/test?retryWrites=true&w=majority';
-const mongodbURI = 'mongodb://<db_username>:<db_password>@<hostname>/?ssl=true&replicaSet=atlas-ev1hnb-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0';
+const mongodbURI = 'mongodb://sumit6311:Sumit@1260@<hostname>/?ssl=true&replicaSet=atlas-ev1hnb-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0';
 
 // Connect to MongoDB
 mongoose.connect(
