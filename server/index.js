@@ -1,3 +1,4 @@
+// index.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -5,42 +6,46 @@ const RegisterModel = require('./models/Register');
 
 const app = express();
 
-// CORS Configuration
+// --- 1. CORS Middleware ---
 app.use(
   cors({
-    origin: ['https://deploy-mern-frontend-eight.vercel.app'],
-    methods: ['POST', 'GET'],
+    origin: ["https://deploy-mern-frontend-eight.vercel.app"], // Your frontend URL
+    methods: ["POST", "GET"],
     credentials: true,
   })
 );
 
+// --- 2. Body Parsing ---
 app.use(express.json());
 
-// Connect to MongoDB
-// Make sure your password is properly encoded if it contains '@'
-const mongodbURI = process.env.MONGO_URI || 'mongodb://your-properly-encoded-URI';
-mongoose
-  .connect(mongodbURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Error connecting to MongoDB:', err));
+// --- 3. MongoDB URI with special characters URL-encoded ---
+// Example: If your password is `Sumit@1260`, the `@` becomes `%40`
+const mongodbURI = "mongodb://sumit6311:Sumit%401260@cluster0.g4i5dey.mongodb.net/test?retryWrites=true&w=majority";
 
-// Default route
-app.get('/', (req, res) => {
-  res.json('Hello from the backend!');
+// --- 4. Connect to MongoDB ---
+mongoose.connect(mongodbURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Connected to MongoDB");
+})
+.catch((err) => {
+  console.error("Error connecting to MongoDB:", err);
 });
 
-// Registration route
-app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+// --- 5. Routes ---
+app.get("/", (req, res) => {
+  res.json("Hello from the backend!");
+});
 
+app.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
   try {
-    // Check if email exists
-    const user = await RegisterModel.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: 'Already have an account' });
+    // Check if email already exists
+    const existingUser = await RegisterModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
     // Create new user
@@ -49,16 +54,9 @@ app.post('/register', async (req, res) => {
     return res.status(201).json(result);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Error processing registration' });
+    return res.status(500).json({ error: "Error processing registration" });
   }
 });
 
-// Only listen locally for development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(3001, () => {
-    console.log('Server is running on port 3001');
-  });
-}
-
-// Export the app for Vercel
+// --- 6. Export for Vercel (no `app.listen` here) ---
 module.exports = app;
