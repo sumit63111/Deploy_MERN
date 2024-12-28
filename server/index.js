@@ -17,7 +17,8 @@ app.use(
 app.use(express.json()); // Parse incoming JSON payloads
 
 // MongoDB URI directly included
-const mongodbURI = 'mongodb+srv://yousaf:test123@cluster0.g4i5dey.mongodb.net/test?retryWrites=true&w=majority';
+// const mongodbURI = 'mongodb+srv://yousaf:test123@cluster0.g4i5dey.mongodb.net/test?retryWrites=true&w=majority';
+const mongodbURI = 'mongodb://<db_username>:<db_password>@<hostname>/?ssl=true&replicaSet=atlas-ev1hnb-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0';
 
 // Connect to MongoDB
 mongoose.connect(
