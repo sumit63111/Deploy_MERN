@@ -1,64 +1,74 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const RegisterModel = require('./models/Register');
 
-const app = express();
+import { useState } from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import axios from 'axios'
 
-// CORS Configuration
-app.use(
-  cors({
-    origin: ['https://deploy-mern-frontend-eight.vercel.app'],
-    methods: ['POST', 'GET'],
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// Connect to MongoDB
-// Make sure your password is properly encoded if it contains '@'
-const mongodbURI = process.env.MONGO_URI || 'mongodb://your-properly-encoded-URI';
-mongoose
-  .connect(mongodbURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Error connecting to MongoDB:', err));
-
-// Default route
-app.get('/', (req, res) => {
-  res.json('Hello from the backend!');
-});
-
-// Registration route
-app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-
-  try {
-    // Check if email exists
-    const user = await RegisterModel.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: 'Already have an account' });
-    }
-
-    // Create new user
-    const newUser = new RegisterModel({ name, email, password });
-    const result = await newUser.save();
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Error processing registration' });
+function App() {
+  const [name, setName] = useState()
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
+axios.defaults.withCredentials = true;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios.post('https://deploy-mern-navy.vercel.app/register', {name, email, password})
+    .then(result => console.log(result))
+    .catch(err => console.log(err))
   }
-});
-
-// Only listen locally for development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(3001, () => {
-    console.log('Server is running on port 3001');
-  });
+  return (
+    <div className="d-flex justify-content-center align-items-center bg-primary vh-100">
+      <div className="bg-white p-3 rounded w-25">
+        <h2>Register</h2>
+        <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+            <label htmlFor="email">
+              <strong>Name</strong>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Name"
+              autoComplete="off"
+              name="email"
+              className="form-control rounded-0"
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email">
+              <strong>Email</strong>
+            </label>
+            <input
+              type="email"
+              placeholder="Enter Email"
+              autoComplete="off"
+              name="email"
+              className="form-control rounded-0"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email">
+              <strong>Password</strong>
+            </label>
+            <input
+              type="password"
+              placeholder="Enter Password"
+              name="password"
+              className="form-control rounded-0"
+              onChange={(e) => setPassword(e.target.value)}          
+            />
+          </div>
+          <button type="submit" className="btn btn-success w-100 rounded-0">
+            Register
+          </button>
+          <p>Already Have an Account</p>
+          <button className="btn btn-default border w-100 bg-light rounded-0 text-decoration-none">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-// Export the app for Vercel
-module.exports = app;
+export default App;
